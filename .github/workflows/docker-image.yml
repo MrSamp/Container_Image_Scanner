@@ -17,9 +17,9 @@ jobs:
       uses: docker/setup-buildx-action@v1
 
     - name: Build Docker image
-      run: docker build -t DockerFile:latest .
+      run: docker build -t dockerfile:latest .
 
     - name: Scan Docker image with Trivy
       uses: aquasecurity/trivy-action@master
       with:
-        image-ref: DockerFile:latest
+        image-ref: dockerfile:latest
