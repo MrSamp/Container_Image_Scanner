@@ -1,0 +1,36 @@
+# Nx Repository Scanner Configuration
+# Configuration file for scanning repositories that use Nx packages
+
+# Default search parameters
+default_limit: 50
+detailed_output: false
+
+# GitHub API settings
+github_api_base: "https://api.github.com"
+rate_limit_delay: 1  # seconds between requests
+
+# Search patterns for Nx packages
+nx_package_patterns:
+  - "@nrwl/workspace"
+  - "@nx/workspace"
+  - "nx"
+  - "@nrwl/cli"
+  - "@nx/cli"
+  - "@nrwl/angular"
+  - "@nx/angular"
+  - "@nrwl/react"
+  - "@nx/react"
+  - "@nrwl/node"
+  - "@nx/node"
+
+# File patterns to search
+search_files:
+  - "nx.json"
+  - "package.json"
+  - "workspace.json"
+
+# Output formats
+output_formats:
+  - "text"
+  - "json"
+  - "csv"
