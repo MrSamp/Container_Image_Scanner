@@ -1,0 +1,65 @@
+name: Nx Repository Discovery
+
+on:
+  schedule:
+    # Run weekly on Sundays at 2 AM UTC
+    - cron: '0 2 * * 0'
+  workflow_dispatch:
+    inputs:
+      limit:
+        description: 'Maximum number of repositories to scan'
+        required: false
+        default: '100'
+      search_type:
+        description: 'Type of search to perform'
+        required: false
+        default: 'both'
+        type: choice
+        options:
+          - nx-json
+          - packages
+          - both
+
+jobs:
+  discover-nx-repos:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.9'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
+    - name: Run Nx repository discovery
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        python nx_repo_scanner.py \
+          --token $GITHUB_TOKEN \
+          --limit ${{ github.event.inputs.limit || '100' }} \
+          --search-type ${{ github.event.inputs.search_type || 'both' }} \
+          --detailed \
+          --output nx_repositories_$(date +%Y%m%d).txt
+
+    - name: Upload results
+      uses: actions/upload-artifact@v3
+      with:
+        name: nx-repositories-report
+        path: nx_repositories_*.txt
+        retention-days: 30
+
+    - name: Display summary
+      run: |
+        echo "Nx repository discovery completed!"
+        if [ -f nx_repositories_*.txt ]; then
+          echo "Found $(grep -c "Repository:" nx_repositories_*.txt) repositories"
+          echo "Report saved as artifact: nx-repositories-report"
+        fi
